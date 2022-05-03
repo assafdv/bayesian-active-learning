@@ -378,8 +378,7 @@ where
 \begin_inset Formula $\mathcal{{X}}\rightarrow\mathbb{{R}}$
 \end_inset
 
-, and is assigned a GP prior with zero mean and covariance function (or
- kernel).
+, and is assigned a GP prior.
 \end_layout
 
 \begin_layout Standard
@@ -403,7 +402,7 @@ The posterior predictive of
 \begin_inset Formula $y$
 \end_inset
 
- is than given by 
+ is then given by 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "key-2"
@@ -526,7 +525,7 @@ noprefix "false"
 \end_inset
 
 ), one must compute the expectation 
-\begin_inset Formula $\mathbb{{E}}_{f_{\boldsymbol{x}}\sim p(f_{\boldsymbol{x}}|\boldsymbol{x},\mathcal{D})}[\mathrm{H}[y|f_{\boldsymbol{x}}]]\}$
+\begin_inset Formula $\mathbb{{E}}_{f_{\boldsymbol{x}}\sim p(f_{\boldsymbol{x}}|\boldsymbol{x},\mathcal{D})}\left\{\mathrm{H}[y|f_{\boldsymbol{x}}]\right\}$
 \end_inset
 
 .
