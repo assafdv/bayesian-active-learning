@@ -188,8 +188,8 @@ class GPCTrainer:
         compute the expectation of the entropy of y given the latent f (GP). 
         The expectation is taken w.r.t to the latent GP f and is computed using numerical integration.
         :param X: (array=[Nx,n_dim], float). Input samples
-        :param method: string, method used to approximate the expectation. Support values are 'sampling' and
-        'riemann_sum'.
+        :param method: string, method used to approximate the expectation. Supported values are:
+         'sampling' and 'riemann_sum'
         :param n_samples: number of sampling points.
         :return: array (shape=[Nx,_], float). Expected entropy.
         """
@@ -217,20 +217,22 @@ class GPCTrainer:
             raise ValueError("unsupported method")
         return expetced_entropy
 
-    def compute_informativeness(self, X):
+    def compute_informativeness(self, X, method='riemann_sum'):
         """
         compute the informativeness of a data sample X according to Bayesian Active Learning by Disagreement (BALD)
         criterion, Thus can be used as a Active Learning query criteria in Gaussian Process models as described in:
         Houlsby, Neil, et al. "Bayesian active learning for classification and preference learning." arXiv
          preprint arXiv:1112.5745(2011.
         :param X: (array=[n_samples,n_dim], float). Input samples
+        :param method: string, method used to approximate the expectation. Supported values are:
+         'sampling' and 'riemann_sum'.
         :return: (array=[n_samples,_], float). informativeness for each input sample.
         """
         # compute entropy of y
         entropy_y = self.compute_entopy_y(X)
 
         # the expectation (w.r.t to the posterior predictive of f) of the entropy of y given f
-        expected_entropy_y_f = self.compute_exected_entropy_y_cond_f(X)
+        expected_entropy_y_f = self.compute_exected_entropy_y_cond_f(X, method)
 
         # information criterion
         informativeness = entropy_y - expected_entropy_y_f
