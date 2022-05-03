@@ -283,6 +283,22 @@ class BALDSamplerTests(unittest.TestCase):
         logging.info('ALC results: bald - {:.3f}, rand - {:.3}'.format(alc_bald, alc_rand))
         self.assertGreater(alc_bald, alc_rand)
 
+    def test_information_critetia(self):
+        """ Test information criteria implementation """
+        # create data set
+        X, y = self.generate_X_y_bic(self.n_samples, self.n_dims)
+        y = y[:, np.newaxis]
+
+        # train model
+        kern_params = self.get_kernel_params()
+        self.model.train(X, y, kern_params=kern_params)
+
+        criteria_1 = self.model.compute_informativeness(X, method="riemann_sum")
+        criteria_2 = self.model.compute_informativeness(X, method="sampling")
+        max_err = np.max(np.abs(criteria_1-criteria_2))
+        logging.info(f"max error: {max_err}")
+        self.assertGreater(1e-2, max_err)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
