@@ -1,0 +1,701 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass scrartcl
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Bayesian Active Learning
+\end_layout
+
+\begin_layout Author
+Assaf Dvora
+\end_layout
+
+\begin_layout Section
+Introduction 
+\end_layout
+
+\begin_layout Standard
+Bayesian Active Learning by Disagreement (BALD) 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-1"
+literal "false"
+
+\end_inset
+
+ is an information theoretic approach for active learning designed for the
+ Gaussian Process Classifier.
+ The following sections describes this approach.
+\end_layout
+
+\begin_layout Section
+Bayesian Information Theoretic Active Learning
+\end_layout
+
+\begin_layout Standard
+We consider a fully discriminative model where the goal of active learning
+ is to discover the dependencies of some variable 
+\begin_inset Formula $y\in\mathcal{{Y}}$
+\end_inset
+
+ on an input variable 
+\begin_inset Formula $\boldsymbol{x}\in\mathcal{{X}}.$
+\end_inset
+
+ The key idea in active learning is that the learner chooses the input queries
+ 
+\begin_inset Formula $\boldsymbol{x}_{i}\in\mathcal{{X}}$
+\end_inset
+
+ and observes the system's responses 
+\begin_inset Formula $y_{i}$
+\end_inset
+
+, rather than passively receiving 
+\begin_inset Formula $(\boldsymbol{x}_{i},y_{i})$
+\end_inset
+
+ pairs.
+ 
+\end_layout
+
+\begin_layout Standard
+Within a Bayesian framework we assume existence of some latent parameters,
+ 
+\begin_inset Formula $\boldsymbol{\theta}$
+\end_inset
+
+ (e.g.
+ GP latent function), that controls the dependence between inputs and outputs
+ through the conditional distribution 
+\begin_inset Formula $p(y|\boldsymbol{x},\boldsymbol{\theta})$
+\end_inset
+
+.
+ Having observed data 
+\begin_inset Formula $\mathcal{{D}}=\{(\boldsymbol{x}_{i},y_{i})\}_{i=1}^{n}$
+\end_inset
+
+, a posterior distribution over the latent parameters is inferred, 
+\begin_inset Formula $p(\boldsymbol{\theta}|\mathcal{{D}}).$
+\end_inset
+
+ The central goal of information theoretic active learning is to reduce
+ the number of possible hypotheses maximally fast.
+ I.e., minimizing the uncertainty about the parameters using Shannon's entropy.
+ Data points 
+\begin_inset Formula $\mathcal{{D}}'$
+\end_inset
+
+ are selected that satisfy 
+\begin_inset Formula 
+\begin{equation}
+\arg\min_{\mathcal{{D}}'}\mathrm{H}[\boldsymbol{\theta}|\mathcal{{D}}']=-\int p(\boldsymbol{\theta}|\mathcal{{D}}')\log p(\boldsymbol{\theta}|\mathcal{D}')
+\end{equation}
+
+\end_inset
+
+Since solving this problem is NP-hard, a greedy policy is often used.
+ Therefore the objective is to seek that data point 
+\begin_inset Formula $\boldsymbol{x}$
+\end_inset
+
+ that maximizes the decrease in posterior entropy 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-1"
+literal "false"
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\arg\max_{\boldsymbol{x}^{*}}\{\mathrm{H}[\boldsymbol{\theta}|\mathcal{{D}}]-\mathrm{H}[\boldsymbol{\theta}|y,\boldsymbol{x},\mathcal{{D}}]\}\label{eq:al_objective}
+\end{equation}
+
+\end_inset
+
+In practice, 
+\begin_inset Formula $y$
+\end_inset
+
+ is unknown and therefore the second term in Eq.
+ (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:al_objective"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) is replaced by the expected posterior entropy
+\begin_inset Formula 
+\begin{equation}
+\arg\max_{\boldsymbol{x}^{*}}\{\mathrm{H}[\boldsymbol{\theta}|\mathcal{{D}}]-\mathbb{{E}}_{y\sim p(y|\boldsymbol{x},\mathcal{{D}})}[\mathrm{H}[\boldsymbol{\theta}|y,\boldsymbol{x},\mathcal{{D}}]]\}\label{eq:al_objective_expected}
+\end{equation}
+
+\end_inset
+
+This solution however arises a computational difficulty: if 
+\begin_inset Formula $N_{\boldsymbol{x}}$
+\end_inset
+
+ data points are under consideration, and 
+\begin_inset Formula $N_{y}$
+\end_inset
+
+ responses may be seen, then 
+\begin_inset Formula $\mathcal{{O}}(N_{\boldsymbol{x}}N_{y})$
+\end_inset
+
+ posterior updates are required.
+\end_layout
+
+\begin_layout Standard
+An important insight arises if we note that the objective in Eq.
+ (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:al_objective"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) is equal to the mutual information between the latent parameters 
+\begin_inset Formula $\boldsymbol{\theta}$
+\end_inset
+
+ and the unknown responses 
+\begin_inset Formula $y^{*}$
+\end_inset
+
+, 
+\begin_inset Formula $I[\boldsymbol{\theta},y^{*}|\boldsymbol{x}^{*},\mathcal{{D}}]$
+\end_inset
+
+.
+ Using this insight it is simple to show that the objective can be can be
+ rearranged to compute the entropies in the 
+\begin_inset Formula $y$
+\end_inset
+
+ space (see Appendix A.)
+\begin_inset Formula 
+\begin{equation}
+\arg\max_{\boldsymbol{x}^{*}}\{\mathrm{H}[y|\boldsymbol{x},\mathcal{{D}}]-\mathbb{{E}}_{\boldsymbol{\theta}\sim p(\boldsymbol{\theta}|\mathcal{D})}[\mathrm{H}[y|\boldsymbol{\theta},\boldsymbol{x}]]\}\label{eq:al_objective_y}
+\end{equation}
+
+\end_inset
+
+Eq.
+ (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:al_objective_y"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) overcomes the computational difficulty described in Eq.
+ (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:al_objective_expected"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ The latent parameter 
+\begin_inset Formula $\boldsymbol{\theta}$
+\end_inset
+
+ is now conditioned only on 
+\begin_inset Formula $\mathcal{{D}},$
+\end_inset
+
+ so only 
+\begin_inset Formula $\mathcal{{O}}(1)$
+\end_inset
+
+ posterior updates are required.
+ Eq.
+ (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:al_objective_y"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) also provides us with an interesting intuition about the objective; we
+ seek the 
+\begin_inset Formula $\boldsymbol{x}$
+\end_inset
+
+ for which the model is marginally most uncertain about 
+\begin_inset Formula $y$
+\end_inset
+
+ (high 
+\begin_inset Formula $\mathrm{H}[y|\boldsymbol{x},\mathcal{{D}}]$
+\end_inset
+
+), but for which, given individual settings of the parameters, 
+\begin_inset Formula $y$
+\end_inset
+
+ is confident (low 
+\begin_inset Formula $\mathbb{{E}}_{\boldsymbol{\theta}\sim p(\boldsymbol{\theta}|\mathcal{D})}[\mathrm{H}[y|\boldsymbol{\theta},\boldsymbol{x}]]$
+\end_inset
+
+).
+ Further analysis of the objective function is given in Section (5).
+ We note that the argument in (4) is non-negative as we show in Appendix
+ B.
+ 
+\end_layout
+
+\begin_layout Section
+Gaussian Process Classifier (GPC)
+\end_layout
+
+\begin_layout Standard
+In this section we introduce the Gaussian Process Classifier (GPC) 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-2"
+literal "false"
+
+\end_inset
+
+.
+ The probabilistic model underlying GPC is as follows
+\begin_inset Formula 
+\begin{align*}
+f(\boldsymbol{x}) & \sim\mathcal{{GP}}(0,k(\cdot,\cdot))\\
+y|\boldsymbol{x},f & \sim Bernoulli(\Phi(f(\boldsymbol{x}))
+\end{align*}
+
+\end_inset
+
+where 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ is the Gaussian CDF.
+ The latent parameter, now called 
+\begin_inset Formula $f(\boldsymbol{x})$
+\end_inset
+
+, is a function 
+\begin_inset Formula $\mathcal{{X}}\rightarrow\mathbb{{R}}$
+\end_inset
+
+, and is assigned a GP prior with zero mean and covariance function (or
+ kernel).
+\end_layout
+
+\begin_layout Standard
+Inference in the GPC model is non-Gaussian and intractable.
+ Throughout this section we will assume that a Gaussian approximation of
+ the posterior (e.g.
+ Laplace approximation) is used.
+ The posterior predictive distribution of 
+\begin_inset Formula $f(\boldsymbol{x})$
+\end_inset
+
+ is than given by
+\begin_inset Formula 
+\begin{equation}
+p(f(\boldsymbol{x})|\boldsymbol{x},\mathcal{D})=\mathcal{{N}}(f(\boldsymbol{x})|\mu_{\boldsymbol{x}},\sigma_{\boldsymbol{x}}^{2})
+\end{equation}
+
+\end_inset
+
+The posterior predictive of 
+\begin_inset Formula $y$
+\end_inset
+
+ is than given by 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-2"
+literal "false"
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+p(y|\boldsymbol{x},\mathcal{{D}})=\Phi\left(\frac{\mu_{\boldsymbol{x}}}{\sqrt{1+\sigma_{\boldsymbol{x}}^{2}}}\right)\label{eq:posterior_predictive_y}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+GPC Active Learning
+\end_layout
+
+\begin_layout Standard
+In the GPC case, the objective function given in Eq.
+ (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:al_objective_y"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), takes the following form
+\begin_inset Formula 
+\begin{equation}
+\arg\max_{\boldsymbol{x}^{*}}\{\mathrm{H}[y|\boldsymbol{x},\mathcal{{D}}]-\mathbb{{E}}_{f_{\boldsymbol{x}}\sim p(f_{\boldsymbol{x}}|\boldsymbol{x},\mathcal{D})}[\mathrm{H}[y|f_{\boldsymbol{x}}]]\}\label{eq:al_objective_f}
+\end{equation}
+
+\end_inset
+
+The first term in (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:al_objective_f"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) which is the entropy of the posterior predictive of 
+\begin_inset Formula $y$
+\end_inset
+
+ can be handled analytically: 
+\begin_inset Formula 
+\[
+\mathrm{H}[y|\boldsymbol{x},\mathcal{{D}}]=-p(y|\boldsymbol{x},\mathcal{{D}})\log p(y|\boldsymbol{x},\mathcal{{D}})-(1-p(y|\boldsymbol{x},\mathcal{{D}}))\log(1-p(y|\boldsymbol{x},\mathcal{{D}}))
+\]
+
+\end_inset
+
+The second term in (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:al_objective_f"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) involves integration over 
+\begin_inset Formula $f$
+\end_inset
+
+ space of the entropy of 
+\begin_inset Formula $y|f_{\boldsymbol{x}}$
+\end_inset
+
+ 
+\begin_inset Formula 
+\begin{equation}
+\mathbb{{E}}_{f_{\boldsymbol{x}}}[\mathrm{H}[y|f_{\boldsymbol{x}}]]=\int\mathrm{H}[y|f_{\boldsymbol{x}}]\mathcal{{N}}(f_{\boldsymbol{x}}|\mu_{\boldsymbol{x}},\sigma_{\boldsymbol{x}}^{2})df_{\boldsymbol{x}}\label{eq:obj_sec_term}
+\end{equation}
+
+\end_inset
+
+where the entropy of 
+\begin_inset Formula $y|f_{\boldsymbol{x}}$
+\end_inset
+
+ is given by
+\begin_inset Formula 
+\begin{align}
+\mathrm{H}[y|f_{\boldsymbol{x}}] & =-p(y|f_{\boldsymbol{x}})\log p(y|f_{\boldsymbol{x}})-(1-p(y|f_{\boldsymbol{x}}))\log(1-p(y|f_{\boldsymbol{x}}))\\
+ & =-\Phi(f(\boldsymbol{x})\log\Phi(f(\boldsymbol{x})-(1-\Phi(f(\boldsymbol{x}))\log(1-\Phi(f(\boldsymbol{x}))
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Numerical Integration
+\end_layout
+
+\begin_layout Standard
+To compute the objective function (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:al_objective_f"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), one must compute the expectation 
+\begin_inset Formula $\mathbb{{E}}_{f_{\boldsymbol{x}}\sim p(f_{\boldsymbol{x}}|\boldsymbol{x},\mathcal{D})}[\mathrm{H}[y|f_{\boldsymbol{x}}]]\}$
+\end_inset
+
+.
+ Using the strong law of large number (SLLN) one can approximate the expectation
+ by summation over samples from the posterior.
+ Alternatively, numerical integration can be used to solve the integral
+ 
+\begin_inset Formula 
+\begin{align}
+\mathbb{{E}}_{f_{\boldsymbol{x}}}[\mathrm{H}[y|f_{\boldsymbol{x}}]] & =\int\mathrm{H}[y|f_{\boldsymbol{x}}]\mathcal{{N}}(f_{\boldsymbol{x}}|\mu_{\boldsymbol{x}},\sigma_{\boldsymbol{x}}^{2})df_{\boldsymbol{x}}=\nonumber \\
+ & =\frac{1}{\sqrt{2\pi\sigma_{\boldsymbol{x}}^{2}}}\int\mathrm{H}[y|f_{\boldsymbol{x}}]\exp\left[-\frac{1}{2}\left(\frac{f_{\boldsymbol{x}}-\mu_{\boldsymbol{x}}}{\sigma_{\boldsymbol{x}}}\right)^{2}\right]df_{\boldsymbol{x}}\label{eq:expectation_as_integral}
+\end{align}
+
+\end_inset
+
+By using change of variables we obtain 
+\begin_inset Formula 
+\begin{equation}
+z=\frac{f_{\boldsymbol{x}}-\mu_{\boldsymbol{x}}}{\sigma_{\boldsymbol{x}}},\quad\text{\ensuremath{\frac{dz}{df_{x}}=\frac{1}{\sigma_{\boldsymbol{x}}}}}
+\end{equation}
+
+\end_inset
+
+and (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:expectation_as_integral"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) becomes 
+\begin_inset Formula 
+\begin{equation}
+\mathbb{{E}}_{f_{\boldsymbol{x}}}[\mathrm{H}[y|f_{\boldsymbol{x}}]]=\frac{1}{\sqrt{2\pi}}\int\mathrm{H}[y|\sigma_{\boldsymbol{x}}z+\mu_{\boldsymbol{x}}]\exp[-\frac{z^{2}}{2}]dz
+\end{equation}
+
+\end_inset
+
+The integral can now be approximated using numerical integration
+\begin_inset Formula 
+\begin{equation}
+\mathbb{{E}}_{f_{\boldsymbol{x}}}[\mathrm{H}[y|f_{\boldsymbol{x}}]]\approx\frac{1}{\sqrt{2\pi}}\sum_{i=1}^{n}\mathrm{H}[y|\sigma_{\boldsymbol{x}}z_{i}+\mu_{\boldsymbol{x}}]\exp[-\frac{z_{i}^{2}}{2}]\Delta z
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section*
+Appendix A.
+ 
+\end_layout
+
+\begin_layout Standard
+Using Bayes rule we can express the objective in Eq.
+ (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:al_objective_expected"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) in the 
+\begin_inset Formula $y$
+\end_inset
+
+ space
+\begin_inset Formula 
+\begin{align*}
+ & \arg\max_{\boldsymbol{x}}\{H[\boldsymbol{\theta}|\mathcal{{D}}]-\mathbb{{E}}_{y\sim p(y|\boldsymbol{x},{D})}[H[\boldsymbol{\theta}|y,\boldsymbol{x},\mathcal{{D}}]]\}=\\
+ & \arg\min_{\boldsymbol{x}}\mathbb{{E}}_{y\sim p(y|\boldsymbol{x},{D})}[H[\boldsymbol{\theta}|y,\boldsymbol{x},\mathcal{{D}}]]=\\
+ & \arg\min_{\boldsymbol{x}}\mathbb{{E}}_{y\sim p(y|\boldsymbol{x},{D})}[\mathbb{{E}}_{\boldsymbol{\theta}\sim p(\boldsymbol{\theta}|y,\boldsymbol{x},\mathcal{{D}})}[-\log p(\boldsymbol{\theta}|y,\boldsymbol{x},\mathcal{{D}})]]=\\
+ & \arg\max_{\boldsymbol{x}}\mathbb{{E}}_{y\sim p(y|\boldsymbol{x},{D})}[\mathbb{{E}}_{\boldsymbol{\theta}\sim p(\boldsymbol{\theta}|y,\boldsymbol{x},\mathcal{{D}})}[\log p(y|\boldsymbol{\theta},x)+\log p(\boldsymbol{\theta}|\mathcal{{D}})-p(y|\boldsymbol{x},\mathcal{{D}})]]=\\
+ & \arg\max_{\boldsymbol{x}}\{H[y|\boldsymbol{x},\mathcal{{D}}]
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section*
+Appendix B.
+ 
+\end_layout
+
+\begin_layout Standard
+In this section we show that the argument in the objective function (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:al_objective_y"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) is non-negative.
+ 
+\end_layout
+
+\begin_layout Standard
+Denote with 
+\begin_inset Formula $h(\cdot)$
+\end_inset
+
+ the convex function 
+\begin_inset Formula $h(p)=p\log p,p>0$
+\end_inset
+
+ and denote with 
+\begin_inset Formula $\psi_{k,\boldsymbol{x}}(\cdot)$
+\end_inset
+
+ the random variable 
+\begin_inset Formula $\psi_{k,\boldsymbol{x}}(\boldsymbol{\theta})=p(y=k|\boldsymbol{\theta},\boldsymbol{x})$
+\end_inset
+
+, using Jensen inequality we obtain 
+\begin_inset Formula 
+\begin{align*}
+\mathbb{{E}}_{\boldsymbol{\theta}\sim p(\boldsymbol{\theta}|\mathcal{D})}[\mathrm{H}[y|\boldsymbol{\theta},\boldsymbol{x}]] & =\mathbb{{E}}_{\boldsymbol{\theta}\sim p(\boldsymbol{\theta}|\mathcal{D})}\{-\sum_{k=1}^{K}h[\psi_{k,\boldsymbol{x}}(\boldsymbol{\theta})]\}=\\
+ & =-\sum_{k=1}^{K}\mathbb{{E}}_{\boldsymbol{\theta}\sim p(\boldsymbol{\theta}|\mathcal{D})}\{h[\psi_{k,\boldsymbol{x}}(\boldsymbol{\theta})]\}=\\
+ & =-\sum_{k=1}^{K}\int h[\psi_{k,\boldsymbol{x}}(\boldsymbol{\theta})]p(\boldsymbol{\theta}|\mathcal{{D}})d\boldsymbol{\theta}\eqslantless\\
+ & \eqslantless-\sum_{k=1}^{K}h[\int\psi_{k,\boldsymbol{x}}(\boldsymbol{\theta})p(\boldsymbol{\theta}|\mathcal{{D}})d\boldsymbol{\theta}]=\\
+ & =-\sum_{k=1}^{K}h[p(y=k|\boldsymbol{x},\mathcal{{D}}]=\mathrm{H}[y|\boldsymbol{x},\mathcal{{D}}]
+\end{align*}
+
+\end_inset
+
+Thus, 
+\begin_inset Formula $\mathrm{H}[y|\boldsymbol{x},\mathcal{{D}}]\eqslantgtr\mathbb{{E}}_{\boldsymbol{\theta}\sim p(\boldsymbol{\theta}|\mathcal{D})}[\mathrm{H}[y|\boldsymbol{\theta},\boldsymbol{x}]]$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-1"
+
+\end_inset
+
+Houlsby, Neil, et al.
+ "Bayesian active learning for classification and preference learning." arXiv
+ preprint arXiv:1112.5745 (2011).
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-2"
+
+\end_inset
+
+Rasmussen, C.
+ and Williams, C.
+ (2005).
+ Gaussian Processes for Machine Learning.
+ The MIT Press.
+\end_layout
+
+\end_body
+\end_document
